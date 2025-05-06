@@ -4,6 +4,7 @@ import ctypes
 import time
 from sudoku.sudoku_cursor import SudokuCursor
 from xo.xo_cursor import XoCursor
+from checkers.checkers_cursor import CheckersCursor
 import os
 import sys
 import keyboard
@@ -30,7 +31,7 @@ label.pack()
 print(f"timp tkinter1: {time.time()-response_time}")
 
 
-xc,sdc=None,None
+xc,sdc,cc=None,None,None
 
 
 def sudoku_solver(event=None):
@@ -39,6 +40,7 @@ def sudoku_solver(event=None):
         root.unbind("w")
         root.unbind("x")
         root.unbind("s")
+        root.unbind("c")
         sdc = SudokuCursor(root)
 
         sdc.move_to_square()
@@ -50,29 +52,46 @@ def xo_solver(event=None):
         root.unbind("w")
         root.unbind("s")
         root.unbind("x")
+        root.unbind("c")
 
         xc=XoCursor(root)
 
         xc.move_to_square()
 
+def checkers_solver(event=None):
+        global cc
+        root.unbind("q")
+        root.unbind("w")
+        root.unbind("s")
+        root.unbind("x")
+        root.unbind("c")
+
+        cc=CheckersCursor(root)
+
+        cc.move_to_square()
+
 
 def stop_cursor(event=None):
 
-        global xc,sdc
+        global xc,sdc,cc
         print(xc, sdc)
         if xc is not None:
                 xc.stop_cursor()
         if sdc is not None:
                 sdc.stop_cursor()
+        if cc is not None:
+                cc.stop_cursor()
 
 def rebind_cursor(event=None):
         print("rebinding")
         root.bind("s", sudoku_solver)
         root.bind("x", xo_solver)
+        root.bind("c",checkers_solver)
 
 keyboard.hook_key("esc",stop_cursor)
 root.bind("s", sudoku_solver)
 root.bind("x",xo_solver)
+root.bind("c",checkers_solver)
 root.bind("<<Rebind>>",rebind_cursor)
 root.mainloop()
 

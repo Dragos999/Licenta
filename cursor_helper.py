@@ -18,6 +18,12 @@ class RealCursor:
 
         ctypes.windll.user32.mouse_event(4, 0, 0, 0, 0)
 
+    def hold_click(self):
+        ctypes.windll.user32.mouse_event(2, 0, 0, 0, 0)
+
+    def release_click(self):
+        ctypes.windll.user32.mouse_event(4, 0, 0, 0, 0)
+
     def realistic_click(self):
         ctypes.windll.user32.mouse_event(2, 0, 0, 0, 0)
         time.sleep(0.1)

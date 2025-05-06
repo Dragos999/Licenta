@@ -78,7 +78,7 @@ class SudokuCursor:
         self.rc.set_cursor_position([int(a-5) for a in move[:2]])
 
         self.rc.click()
-        time.sleep(0.05)
+        time.sleep(0.01)
         self.rc.set_cursor_position(ogPos)
         self.rc.press_key(str(move[2]))
 
