@@ -10,7 +10,7 @@ import threading
 
 from cursor_helper import RealCursor
 
-from sudoku.sudoku_solver import Sudoku
+from sudoku.sudoku_detector import Sudoku
 from sudoku.sudoku_mask import SudokuMask
 
 class SudokuCursor:
@@ -61,7 +61,7 @@ class SudokuCursor:
         imagine = cv.imread("C:/Users/mihae/OneDrive/Desktop/temp/ss.jpg")
         sdk=Sudoku()
         self.puncte,self.incomplet,self.complet,self.top_left,self.bottom_right=sdk.rezolva(imagine)
-        if(self.puncte==None):
+        if(self.puncte is None or self.complet is None):
             self.root.event_generate("<<Rebind>>")
             return
         self.mask.set_mask(self.top_left,self.bottom_right)
@@ -70,7 +70,7 @@ class SudokuCursor:
         self.go_to_destination(self.bottom_right[0],self.bottom_right[1])
         print("colturi: ",self.top_left,self.bottom_right)
         print("incomplet: ",self.incomplet.tolist())
-        print("complet: ",self.complet.tolist())
+        print("complet: ",self.complet)
 
 
     def click_and_set(self, move):

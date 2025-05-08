@@ -11,7 +11,7 @@ import copy
 from pynput import mouse
 from cursor_helper import RealCursor
 from checkers.checkers_detector import CheckersDetector
-import checkers.checkers_solver as cs
+from checkers.checkers_solver import CheckersSolver
 
 class CheckersCursor:
     def __init__(self,root):
@@ -24,7 +24,7 @@ class CheckersCursor:
         self.rc=RealCursor()
         self.stop=False
         self.stop_wait = False
-        self.oprite=1
+        self.oprite=3
         self.bottom_right=[]
         self.top_left=[]
         self.detector=CheckersDetector()
@@ -33,6 +33,7 @@ class CheckersCursor:
         self.thread1_stopped = threading.Event()
         self.thread2_stopped = threading.Event()
         self.done=threading.Event()
+        self.cs=CheckersSolver()
 
 
     def go_to_destination(self,dest_x,dest_y):
@@ -123,7 +124,8 @@ class CheckersCursor:
                 if self.careu_copy!=self.careu and self.careu_copy==careu_anterior:
                     counter+=1
 
-                if counter==3:
+
+                if counter==5:
                     self.careu=self.careu_copy
                     print("VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV")
                     print("mutare bot")
@@ -133,7 +135,7 @@ class CheckersCursor:
                         print()
                     break
                 careu_anterior=self.careu_copy
-                time.sleep(0.1)
+                time.sleep(0.2)
             time.sleep(0.1)
             self.bot_turn.set()
 
@@ -159,7 +161,7 @@ class CheckersCursor:
 
                 self.rc.hold_click()
             else:
-
+                time.sleep(0.01)
                 self.rc.click()
                 self.rc.set_cursor_position(ogPos)
 
@@ -210,10 +212,13 @@ class CheckersCursor:
 
 
     def change_in_patch(self,medieOg,i,j):
+
         medieAnterioara=medieOg
         st=time.time()
 
         while time.time()-st<3.0:
+            if self.stop_wait:
+                return
             screenshot = ImageGrab.grab(bbox=(self.segmente[i][j][2], self.segmente[i][j][0], self.segmente[i][j][3], self.segmente[i][j][1]))
             imagine = np.array(screenshot)
             imagine = cv.cvtColor(imagine, cv.COLOR_RGB2BGR)
@@ -236,13 +241,15 @@ class CheckersCursor:
             self.bot_turn.wait()
             self.bot_turn.clear()
 
+
+            timp_inceput=time.time()
+            print("gandesc")
+            _,mutari,self.careu_copy=self.cs.minimax(self.careu_copy, depth=8, alpha=-math.inf, beta=math.inf, maximizing_player=True,st=time.time())
+            print("am gandit: ",time.time()-timp_inceput)
             if (self.stop_wait):
                 self.thread1_stopped.set()
                 print("Thread 1 done")
                 return
-
-            _,mutari,self.careu_copy=cs.minimax(self.careu_copy, depth=10, alpha=-math.inf, beta=math.inf, maximizing_player=True,st=time.time())
-
             if mutari is None:
                 print("final")
                 continue
@@ -251,14 +258,14 @@ class CheckersCursor:
             if type=="dragdrop":
                 for k in range(1,len(mutari)):
                     i, j = mutari[k-1][0], mutari[k-1][1]
-
+                    print(i,j)
                     self.root.after(0, lambda: self.go_click(self.puncte[i][j][0], self.puncte[i][j][1], hold=True))
                     self.done.wait()
                     self.done.clear()
 
                     i, j = mutari[k][0], mutari[k][1]
-
-                    self.root.after(0, lambda: self.go_drag_drop(self.puncte[i_dest][j_dest][0], self.puncte[i_dest][j_dest][1], ogPos))
+                    print(i,j)
+                    self.root.after(0, lambda: self.go_drag_drop(self.puncte[i][j][0], self.puncte[i][j][1], ogPos))
                     self.done.wait()
                     self.done.clear()
 
@@ -356,13 +363,39 @@ class CheckersCursor:
             time.sleep(0.1)
             self.player_turn.set()
 
+
+    def check_if_done(self):
+        self.oprite-=1
+        while(True):
+
+            if (self.cs.is_game_over(self.careu)==True or self.stop==True):
+
+                self.thread1_stopped.clear()
+                self.thread2_stopped.clear()
+
+                self.cs.stop=True
+                self.stop_wait = True
+                self.bot_turn.set()
+
+                self.thread1_stopped.wait()
+                self.thread1_stopped.clear()
+                self.player_turn.set()
+
+                self.thread2_stopped.wait()
+                self.thread2_stopped.clear()
+                print("Thread 3 done")
+                self.oprite+=1
+                return
+            time.sleep(0.1)
+
     def play_against_bot(self):
         self.root.unbind("q")
         self.root.unbind("w")
         self.oprite-=1
         t1 = threading.Thread(target=self.wait_for_move,args=(type,),daemon=True)
         t2 = threading.Thread(target=self.wait_for_change, args=(), daemon=True)
-
+        t3 = threading.Thread(target=self.check_if_done, daemon=True)
+        t3.start()
         t2.start()
         t1.start()
 
@@ -377,7 +410,7 @@ class CheckersCursor:
         self.stop=True
         while(True):
 
-            if(self.oprite==1):
+            if(self.oprite==3):
                 break
             time.sleep(0.5)
         print("totul oprit")

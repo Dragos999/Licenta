@@ -1,142 +1,176 @@
 import copy
 import math
 import time
-# Reprezentare: 0 = gol, 1 = piesă bot, 2 = damă bot, -1 = piesă adversar, -2 = damă adversar
 
-DIRECTION = {
-    1: [(-1, -1), (-1, 1)],    # jucătorul bot (se deplasează în sus)
-    -1: [(1, -1), (1, 1)],     # adversar (se deplasează în jos)
-}
+class CheckersSolver:
+    def __init__(self):
+        self.DIRECTION = {
+            1: [(-1, -1), (-1, 1)],
+            -1: [(1, -1), (1, 1)],
+        }
+        self.stop=False
 
-def in_bounds(x, y):
-    return 0 <= x < 8 and 0 <= y < 8
 
-def deepcopy_board(board):
-    return copy.deepcopy(board)
 
-def get_piece_directions(piece):
-    if abs(piece) == 2:
-        return [(-1, -1), (-1, 1), (1, -1), (1, 1)]  # damele se mișcă în toate direcțiile
-    return DIRECTION[1 if piece > 0 else -1]
+    def in_bounds(self,x, y):
+        return 0 <= x < 8 and 0 <= y < 8
 
-def get_all_moves(board, player):
-    all_moves = []
-    captures = []
+    def deepcopy_board(self,board):
+        return copy.deepcopy(board)
 
-    for x in range(8):
-        for y in range(8):
-            if (player == 1 and board[x][y] > 0) or (player == -1 and board[x][y] < 0):
-                multi_jumps = []
-                find_captures(board, x, y, [], multi_jumps, board[x][y])
-                if multi_jumps:
-                    captures.extend(multi_jumps)
-                else:
-                    steps = get_piece_directions(board[x][y])
-                    for dx, dy in steps:
-                        nx, ny = x + dx, y + dy
-                        if in_bounds(nx, ny) and board[nx][ny] == 0:
-                            all_moves.append([(x, y), (nx, ny)])
+    def get_piece_directions(self,piece):
+        if abs(piece) == 2:
+            return [(-1, -1), (-1, 1), (1, -1), (1, 1)]
+        return self.DIRECTION[1 if piece > 0 else -1]
 
-    return captures if captures else all_moves
+    def get_all_moves(self,board, player):
+        all_moves = []
+        captures = []
 
-def find_captures(board, x, y, path, results, piece):
-    path = path + [(x, y)]
-    found = False
-    for dx, dy in get_piece_directions(piece):
-        mid_x, mid_y = x + dx, y + dy
-        end_x, end_y = x + 2*dx, y + 2*dy
-        if in_bounds(end_x, end_y):
-            enemy = board[mid_x][mid_y]
-            if (enemy != 0 and (enemy * piece < 0)) and board[end_x][end_y] == 0:
-                temp_board = deepcopy_board(board)
-                temp_board[end_x][end_y] = temp_board[x][y]
-                temp_board[x][y] = 0
-                temp_board[mid_x][mid_y] = 0
-                find_captures(temp_board, end_x, end_y, path, results, piece)
-                found = True
-    if not found and len(path) > 1:
-        results.append(path)
+        for x in range(8):
+            for y in range(8):
+                if (player == 1 and board[x][y] > 0) or (player == -1 and board[x][y] < 0):
+                    multi_jumps = []
+                    self.find_captures(board, x, y, [], multi_jumps, board[x][y])
+                    if multi_jumps:
+                        captures.extend(multi_jumps)
+                    else:
+                        steps = self.get_piece_directions(board[x][y])
+                        for dx, dy in steps:
+                            nx, ny = x + dx, y + dy
+                            if self.in_bounds(nx, ny) and board[nx][ny] == 0:
+                                all_moves.append([(x, y), (nx, ny)])
 
-def apply_move(board, move):
-    new_board = deepcopy_board(board)
-    start = move[0]
-    end = move[-1]
-    piece = new_board[start[0]][start[1]]
-    new_board[start[0]][start[1]] = 0
+        return captures if captures else all_moves
 
-    # Captură
-    for i in range(1, len(move)):
-        mid_x = (move[i-1][0] + move[i][0]) // 2
-        mid_y = (move[i-1][1] + move[i][1]) // 2
-        if abs(move[i][0] - move[i-1][0]) == 2:
-            new_board[mid_x][mid_y] = 0
+    def find_captures(self,board, x, y, path, results, piece):
+        path = path + [(x, y)]
+        found = False
+        for dx, dy in self.get_piece_directions(piece):
+            mid_x, mid_y = x + dx, y + dy
+            end_x, end_y = x + 2*dx, y + 2*dy
+            if self.in_bounds(end_x, end_y):
+                enemy = board[mid_x][mid_y]
+                if (enemy != 0 and (enemy * piece < 0)) and board[end_x][end_y] == 0:
+                    temp_board = self.deepcopy_board(board)
+                    temp_board[end_x][end_y] = temp_board[x][y]
+                    temp_board[x][y] = 0
+                    temp_board[mid_x][mid_y] = 0
+                    if temp_board[end_x][end_y] == 1 and end_x == 0:
+                        temp_board[end_x][end_y] = 2
+                    elif temp_board[end_x][end_y] == -1 and end_x == 7:
+                        temp_board[end_x][end_y] = -2
+                    self.find_captures(temp_board, end_x, end_y, path, results, piece)
+                    found = True
+        if not found and len(path) > 1:
+            results.append(path)
 
-    new_board[end[0]][end[1]] = piece
+    def apply_move(self,board, move):
+        new_board = self.deepcopy_board(board)
+        start = move[0]
+        end = move[-1]
+        piece = new_board[start[0]][start[1]]
+        new_board[start[0]][start[1]] = 0
 
-    # Promovare în damă
-    if piece == 1 and end[0] == 0:
-        new_board[end[0]][end[1]] = 2
-    elif piece == -1 and end[0] == 7:
-        new_board[end[0]][end[1]] = -2
 
-    return new_board
+        for i in range(1, len(move)):
+            mid_x = (move[i-1][0] + move[i][0]) // 2
+            mid_y = (move[i-1][1] + move[i][1]) // 2
+            if abs(move[i][0] - move[i-1][0]) == 2:
+                new_board[mid_x][mid_y] = 0
+            if move[i-1][0]==0 and piece==1:
+                piece=2
+            elif move[i-1][0]==7 and piece==-1:
+                piece=-2
+        new_board[end[0]][end[1]] = piece
 
-def evaluate(board):
-    score = 0
-    for x in range(8):
-        for y in range(8):
-            cell = board[x][y]
-            if cell == 1:
-                score += 3 + (7 - x) * 0.1  # piesele mai aproape de promovare sunt mai valoroase
-            elif cell == 2:
-                score += 5 + 0.5 * (x in [2,3,4,5])  # damele centrale sunt mai bune
-            elif cell == -1:
-                score -= 3 + x * 0.1
-            elif cell == -2:
-                score -= 5 + 0.5 * (x in [2,3,4,5])
-    return score
 
-def is_game_over(board):
-    return not get_all_moves(board, 1) or not get_all_moves(board, -1)
+        if piece == 1 and end[0] == 0:
+            new_board[end[0]][end[1]] = 2
+        elif piece == -1 and end[0] == 7:
+            new_board[end[0]][end[1]] = -2
 
-def minimax(board, depth, alpha, beta, maximizing_player,st):
+        return new_board
 
-    final_board=[]
-    if depth == 0 or is_game_over(board):
-        return evaluate(board), None, None
+    def evaluate(self,board):
 
-    best_move = None
-    player = 1 if maximizing_player else -1
-    moves = get_all_moves(board, player)
+        score = 0
+        for x in range(8):
+            for y in range(8):
+                cell = board[x][y]
+                distance_to_margin=min(y,7-y)
+                margin_score=(3-distance_to_margin)*0.1
 
-    if maximizing_player:
-        max_eval = -math.inf
+                if cell == 1:
+                    score += 3 + (7 - x) * 0.1 + margin_score
+                elif cell == 2:
+                    score += 5 + 0.5 * (x in [2,3,4,5])
+                elif cell == -1:
+                    score -= 3 + x * 0.1 + margin_score
+                elif cell == -2:
+                    score -= 5 + 0.5 * (x in [2,3,4,5])
+        return score
+
+    def is_game_over(self,board):
+        return not self.get_all_moves(board, 1) or not self.get_all_moves(board, -1)
+
+    def sort_moves(self,board, moves, player):
+        scored = []
         for move in moves:
+            temp = self.apply_move(board, move)
+            score = self.evaluate(temp)
+            scored.append((score, move))
+        scored.sort(reverse=(player == 1))
+        return [m for s, m in scored]
 
-            new_board = apply_move(board, move)
-            eval_score, _,_ = minimax(new_board, depth - 1, alpha, beta, False,st)
-            if eval_score > max_eval:
-                max_eval = eval_score
-                best_move = move
-                final_board = new_board
-            alpha = max(alpha, eval_score)
-            if beta <= alpha or time.time()-st>=5.0:
-                break
-        return max_eval, best_move, final_board
-    else:
-        min_eval = math.inf
-        for move in moves:
 
-            new_board = apply_move(board, move)
-            eval_score, _ ,_= minimax(new_board, depth - 1, alpha, beta, True,st)
-            if eval_score < min_eval:
-                min_eval = eval_score
-                best_move = move
-                final_board= new_board
-            beta = min(beta, eval_score)
-            if beta <= alpha or time.time()-st>=5.0:
-                break
-        return min_eval, best_move, final_board
+    def minimax(self,board, depth, alpha, beta, maximizing_player,st):
+        if self.stop:
+            return None,None,None
+        final_board=[]
+        if depth == 0 or self.is_game_over(board):
+            return self.evaluate(board), None, None
+
+        best_move = None
+        player = 1 if maximizing_player else -1
+        moves = self.get_all_moves(board, player)
+        if len(moves)>=10 and depth>7:
+            depth-=1
+
+
+
+        if maximizing_player:
+            max_eval = -math.inf
+            for move in moves:
+
+                new_board = self.apply_move(board, move)
+                eval_score, _,_ = self.minimax(new_board, depth - 1, alpha, beta, False,st)
+                if eval_score is None:
+                    return None,None,None
+                if eval_score > max_eval:
+                    max_eval = eval_score
+                    best_move = move
+                    final_board = new_board
+                alpha = max(alpha, eval_score)
+                if beta <= alpha or time.time()-st>=500.0:
+                    break
+            return max_eval, best_move, final_board
+        else:
+            min_eval = math.inf
+            for move in moves:
+
+                new_board = self.apply_move(board, move)
+                eval_score, _ ,_= self.minimax(new_board, depth - 1, alpha, beta, True,st)
+                if eval_score is None:
+                    return None,None,None
+                if eval_score < min_eval:
+                    min_eval = eval_score
+                    best_move = move
+                    final_board= new_board
+                beta = min(beta, eval_score)
+                if beta <= alpha or time.time()-st>=5.0:
+                    break
+            return min_eval, best_move, final_board
 
 """
 # Inițializare tablou simplu

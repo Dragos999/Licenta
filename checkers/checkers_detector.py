@@ -12,6 +12,8 @@ class CheckersDetector:
     def __init__(self):
         self.inamic=None
         self.player=None
+        self.gol=None
+        self.adaos=None
     def afiseaza_imagine(self,title, image):
         copie = cv.resize(image, (0, 0), fx=1, fy=1)
         cv.imshow(title, copie)
@@ -325,7 +327,15 @@ class CheckersDetector:
                     else:
                         linie.append(1)
                 else:
-                    linie.append(0)
+                    if self.comp_histograme(hist,self.gol) >=0.25 or (i+j+self.adaos)%2==0 or (self.comp_histograme(hist,self.inamic)<0 and self.comp_histograme(hist,self.player)<0):
+                        linie.append(0)
+                    else:
+
+                        if self.comp_histograme(hist,self.inamic) > self.comp_histograme(hist,self.player):
+                            linie.append(-2)
+
+                        else:
+                            linie.append(2)
             careu.append(linie)
 
         i=0
@@ -352,7 +362,7 @@ class CheckersDetector:
 
         image_m_blur = cv.medianBlur(image, 3)
         image_g_blur = cv.GaussianBlur(image_m_blur, (5, 5), 4)
-        image_sharpened = cv.addWeighted(image_m_blur, 1.2, image_g_blur, -0.8, 0)
+        image_sharpened = cv.addWeighted(image_m_blur, 1.2, image_g_blur, -0.9, 0)
         #self.afiseaza_imagine1("image_sharpened",image_sharpened)
 
         clahe = cv.createCLAHE(clipLimit=2.5, tileGridSize=(7, 7))
@@ -377,10 +387,10 @@ class CheckersDetector:
                     board = approx
                     cont.append(c)
 
-        """            
-        img_cpy=originala.copy()
+
+        """img_cpy=originala.copy()
         cv.drawContours(img_cpy, cont, -1, (0, 255, 0), 4)
-       self.afiseaza_imagine1('dadadada',img_cpy)"""
+        self.afiseaza_imagine1('dadadada',img_cpy)"""
 
         print(len(cont))
         v, o, respinse = None, None, 9999
@@ -451,6 +461,15 @@ class CheckersDetector:
                                segmente[i][j][2]:segmente[i][j][3]]
                 patch_player_hsv = cv.cvtColor(patch_player, cv.COLOR_BGR2HSV)
                 self.player = self.get_histograme(patch_player_hsv)
+
+                i, j = 4, 7
+                patch_gol=imagine_neschimbata[segmente[i][j][0]:segmente[i][j][1],
+                               segmente[i][j][2]:segmente[i][j][3]]
+                patch_gol_hsv = cv.cvtColor(patch_gol, cv.COLOR_BGR2HSV)
+                self.gol = self.get_histograme(patch_gol_hsv)
+
+                self.adaos=0
+
             else:
                 i, j = 0, 0
                 patch_inamic = imagine_neschimbata[segmente[i][j][0]:segmente[i][j][1],
@@ -464,8 +483,18 @@ class CheckersDetector:
                 patch_player_hsv = cv.cvtColor(patch_player, cv.COLOR_BGR2HSV)
                 self.player = self.get_histograme(patch_player_hsv)
 
+                i, j = 4, 6
+                patch_gol = imagine_neschimbata[segmente[i][j][0]:segmente[i][j][1],
+                            segmente[i][j][2]:segmente[i][j][3]]
+                patch_gol_hsv = cv.cvtColor(patch_gol, cv.COLOR_BGR2HSV)
+                self.gol = self.get_histograme(patch_gol_hsv)
+
+                self.adaos=1
+
             medii=self.get_medii(pt_medii,segmente)
-        #self.afiseaza_imagine1("originala",originala)
+        """self.afiseaza_imagine1("originala",originala)
+        if top_left is not None:
+            self.afiseaza_imagine1("originala", originala[top_left[1]:bottom_right[1],top_left[0]:bottom_right[0]])"""
         return top_left, bottom_right, segmente, puncte,medii
 
     def verifica_schimbare(self,image,segmente,medii,careu):
@@ -489,10 +518,26 @@ class CheckersDetector:
         return y_schimbat,x_schimbat,y_initial,x_initial,capturati
 
 
-
-
-
-
+"""
+cr=CheckersDetector()
+for i in range(25,26):
+    img=cv.imread(f"C:/Users/mihae/OneDrive/Desktop/checkers/checkers{i}.png")
+    top_left, bottom_right, segmente, puncte, medii =cr.extrage_careu(img)
+    careuOg = [
+        [0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0],
+        [0, 0, 0, 0, 0, 0, 0, 0],
+    ]
+    tare=(cr.determina_configuratie(img,segmente,careuOg))
+    for k in range(8):
+        for j in range(8):
+            print(tare[k][j],end=" ")
+        print()"""
 
 
 
