@@ -309,6 +309,9 @@ class CheckersDetector:
         careu=[]
         if self.inamic is None:
             return None
+
+        pozitie_initiala=None
+        pozitie_finala=None
         for i in range(8):
             linie=[]
             for j in range(8):
@@ -336,7 +339,15 @@ class CheckersDetector:
 
                         else:
                             linie.append(2)
+                if careuOg[i][j]==-2 and linie[j]!=-2:
+                    pozitie_initiala=[i,j]
+                if careuOg[i][j]==0 and linie[j]!=0:
+                    pozitie_finala=[i,j]
             careu.append(linie)
+
+        if pozitie_initiala is not None and pozitie_finala is not None:
+
+            careu[pozitie_finala[0]][pozitie_finala[1]]=careuOg[pozitie_initiala[0]][pozitie_initiala[1]]
 
         i=0
         for j in range(8):

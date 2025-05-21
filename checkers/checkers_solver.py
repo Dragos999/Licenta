@@ -95,9 +95,13 @@ class CheckersSolver:
     def evaluate(self,board):
 
         score = 0
+        counter_inamic=0
         for x in range(8):
             for y in range(8):
+
                 cell = board[x][y]
+                if cell<0:
+                    counter_inamic+=1
                 distance_to_margin=min(y,7-y)
                 margin_score=(3-distance_to_margin)*0.1
 
@@ -109,6 +113,9 @@ class CheckersSolver:
                     score -= 3 + x * 0.1 + margin_score
                 elif cell == -2:
                     score -= 5 + 0.5 * (x in [2,3,4,5])
+        if counter_inamic==0:
+            print("victorieeeee")
+            score += 1000
         return score
 
     def is_game_over(self,board):
