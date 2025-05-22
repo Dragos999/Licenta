@@ -12,6 +12,7 @@ from pynput import mouse
 from cursor_helper import RealCursor
 from xo.xo_detector import XoDetector
 from xo.xo_solver import XoSolver
+from screen_info import screen_height,screen_width,initial_y,initial_x
 
 class XoCursor:
     def __init__(self,root):
@@ -40,10 +41,12 @@ class XoCursor:
         self.clicked_patch=[]
         self.click_listener=None
 
+
+
     def go_to_destination(self,dest_x,dest_y):
 
         if self.stop:
-            self.root.geometry(f"+{1850}+{940}")
+            self.root.geometry(f"+{initial_x}+{initial_y}")
             self.oprite+=1
             return
         cx = self.root.winfo_x()
@@ -70,11 +73,16 @@ class XoCursor:
 
     def move_to_square(self):
         screenshot = ImageGrab.grab()
-        screenshot.save("C:/Users/mihae/OneDrive/Desktop/temp/ss.png")
-        screenshot.close()
-        imagine = cv.imread("C:/Users/mihae/OneDrive/Desktop/temp/ss.png")
+        imagine = np.array(screenshot)
+        imagine = cv.cvtColor(imagine, cv.COLOR_RGB2BGR)
+        imagine_resized = cv.resize(imagine, (1920, 1080))
 
-        self.puncte, self.segmente, self.medii,self.bottom_right,self.top_left=self.detector.get_xo(imagine)
+        self.puncte, self.segmente, self.medii,self.bottom_right,self.top_left=self.detector.get_xo(imagine_resized,imagine)
+
+        """cv.circle(imagine, tuple(self.bottom_right), 5, (0, 0, 255), -1)
+        cv.circle(imagine, tuple(self.top_left), 5, (0, 0, 255), -1)
+        self.detector.afiseaza_imagine1("bun",imagine)"""
+
         if(self.puncte is None):
             self.root.event_generate("<<Rebind>>")
             return
@@ -94,7 +102,7 @@ class XoCursor:
     def go_click(self, dest_x, dest_y):
 
         if self.stop:
-            self.root.geometry(f"+{1850}+{940}")
+            self.root.geometry(f"+{initial_x}+{initial_y}")
             self.done.set()
             return
         cx = self.root.winfo_x()
@@ -309,6 +317,7 @@ class XoCursor:
                 imagine = np.array(screenshot)
                 imagine = cv.cvtColor(imagine, cv.COLOR_RGB2GRAY)
                 gata=self.detector.verifica_joc_nou(imagine, self.segmente, self.medii)
+
                 if gata:
                     print("gata")
                     break
@@ -350,7 +359,7 @@ class XoCursor:
                 break
             time.sleep(0.5)
         print("totul oprit")
-        self.root.geometry(f"+{1850}+{940}")
+        self.root.geometry(f"+{initial_x}+{initial_y}")
         self.root.event_generate("<<Rebind>>")
         self.stop=False
 

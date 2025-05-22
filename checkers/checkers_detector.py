@@ -6,6 +6,7 @@ import numpy as np
 import os
 import time
 import itertools
+from screen_info import xratio,yratio
 
 
 class CheckersDetector:
@@ -290,7 +291,7 @@ class CheckersDetector:
         patch_hsv2 = cv.cvtColor(patch2, cv.COLOR_BGR2HSV)
         hist2=self.get_histograme(patch_hsv2)
         print("Asemanare: ",self.comp_histograme(hist1,hist2))
-        return self.comp_histograme(hist1,hist2)>=0.76
+        return self.comp_histograme(hist1,hist2)>=0.73
 
 
 
@@ -363,10 +364,10 @@ class CheckersDetector:
 
 
 
-    def extrage_careu(self,image):
-        pt_medii=image.copy()
+    def extrage_careu(self,image,imagine_reala):
+        pt_medii=imagine_reala.copy()
 
-        imagine_neschimbata=image.copy()
+
 
         originala = image.copy()
         image = cv.cvtColor(image, cv.COLOR_BGR2GRAY)
@@ -403,7 +404,7 @@ class CheckersDetector:
         cv.drawContours(img_cpy, cont, -1, (0, 255, 0), 4)
         self.afiseaza_imagine1('dadadada',img_cpy)"""
 
-        print(len(cont))
+        #print(len(cont))
         v, o, respinse = None, None, 9999
         for c in cont:
             minimx = [9999, 0]
@@ -451,30 +452,33 @@ class CheckersDetector:
         if v is not None:
             linie1 = min(v, key=lambda x: max(x[1], x[3]) - min(x[1], x[3]))
             linie2 = min(o, key=lambda x: max(x[0], x[2]) - min(x[0], x[2]))
-            top_left = [min(linie2[0], linie2[2]), min(linie1[1], linie1[3])]
-            top_right = [max(linie2[0], linie2[2]), min(linie1[1], linie1[3])]
-            bottom_left = [min(linie2[0], linie2[2]), max(linie1[1], linie1[3])]
-            bottom_right = [max(linie2[0], linie2[2]), max(linie1[1], linie1[3])]
+            top_left = [round(min(linie2[0], linie2[2])*xratio), round(min(linie1[1], linie1[3])*yratio)]
+            top_right = [round(max(linie2[0], linie2[2])*xratio), round(min(linie1[1], linie1[3])*yratio)]
+            bottom_left = [round(min(linie2[0], linie2[2])*xratio), round(max(linie1[1], linie1[3])*yratio)]
+            bottom_right = [round(max(linie2[0], linie2[2])*xratio), round(max(linie1[1], linie1[3])*yratio)]
+
+            #print(min(linie2[0], linie2[2]),"  |  ",round(min(linie2[0], linie2[2])*xratio))
+
             latime= top_right[0] - top_left[0]
             print("Latime: ",latime)
 
             segmente, puncte = self.get_segmente_puncte(top_left, top_right, bottom_left, bottom_right,latime)
 
-            if self.tip_clasic(imagine_neschimbata,segmente):
+            if self.tip_clasic(imagine_reala,segmente):
 
                 i, j = 0, 1
-                patch_inamic=imagine_neschimbata[segmente[i][j][0]:segmente[i][j][1], segmente[i][j][2]:segmente[i][j][3]]
+                patch_inamic=imagine_reala[segmente[i][j][0]:segmente[i][j][1], segmente[i][j][2]:segmente[i][j][3]]
                 patch_inamic_hsv = cv.cvtColor(patch_inamic, cv.COLOR_BGR2HSV)
                 self.inamic=self.get_histograme(patch_inamic_hsv)
 
                 i, j = 7, 0
-                patch_player = imagine_neschimbata[segmente[i][j][0]:segmente[i][j][1],
+                patch_player = imagine_reala[segmente[i][j][0]:segmente[i][j][1],
                                segmente[i][j][2]:segmente[i][j][3]]
                 patch_player_hsv = cv.cvtColor(patch_player, cv.COLOR_BGR2HSV)
                 self.player = self.get_histograme(patch_player_hsv)
 
                 i, j = 4, 7
-                patch_gol=imagine_neschimbata[segmente[i][j][0]:segmente[i][j][1],
+                patch_gol=imagine_reala[segmente[i][j][0]:segmente[i][j][1],
                                segmente[i][j][2]:segmente[i][j][3]]
                 patch_gol_hsv = cv.cvtColor(patch_gol, cv.COLOR_BGR2HSV)
                 self.gol = self.get_histograme(patch_gol_hsv)
@@ -483,19 +487,19 @@ class CheckersDetector:
 
             else:
                 i, j = 0, 0
-                patch_inamic = imagine_neschimbata[segmente[i][j][0]:segmente[i][j][1],
+                patch_inamic = imagine_reala[segmente[i][j][0]:segmente[i][j][1],
                                segmente[i][j][2]:segmente[i][j][3]]
                 patch_inamic_hsv = cv.cvtColor(patch_inamic, cv.COLOR_BGR2HSV)
                 self.inamic = self.get_histograme(patch_inamic_hsv)
 
                 i, j = 7, 1
-                patch_player = imagine_neschimbata[segmente[i][j][0]:segmente[i][j][1],
+                patch_player = imagine_reala[segmente[i][j][0]:segmente[i][j][1],
                                segmente[i][j][2]:segmente[i][j][3]]
                 patch_player_hsv = cv.cvtColor(patch_player, cv.COLOR_BGR2HSV)
                 self.player = self.get_histograme(patch_player_hsv)
 
                 i, j = 4, 6
-                patch_gol = imagine_neschimbata[segmente[i][j][0]:segmente[i][j][1],
+                patch_gol = imagine_reala[segmente[i][j][0]:segmente[i][j][1],
                             segmente[i][j][2]:segmente[i][j][3]]
                 patch_gol_hsv = cv.cvtColor(patch_gol, cv.COLOR_BGR2HSV)
                 self.gol = self.get_histograme(patch_gol_hsv)

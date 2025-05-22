@@ -5,7 +5,7 @@ import cv2 as cv
 import numpy as np
 import os
 import time
-import itertools
+from screen_info import xratio,yratio
 
 
 class XoDetector:
@@ -414,16 +414,19 @@ class XoDetector:
 
 
 
-    def get_xo(self,image):
+    def get_xo(self,image,imagine_reala):
         #self.afiseaza_imagine1("initial", imagine)
 
         verdict, result, corners = self.detecteaza_careu(image)
         if verdict == True:
+            print(corners)
+            corners=[[round(x*xratio),round(y*yratio)] for x,y in corners]
+            print(corners)
             #self.afiseaza_imagine1("result", result)
             self.segmente = self.get_segmente(corners)
             #print(segmente)
             puncte = self.defineste_puncte(corners)
-            medii = self.get_medii(image, self.segmente)
+            medii = self.get_medii(imagine_reala, self.segmente)
 
             return puncte,self.segmente,medii,corners[3],corners[0]
         return None,None,None,None,None

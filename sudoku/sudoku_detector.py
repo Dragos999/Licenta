@@ -6,6 +6,7 @@ import numpy as np
 import os
 import time
 import sudoku.sudoku_solver as ss
+from screen_info import xratio,yratio
 
 root_dir = os.path.dirname(os.path.abspath(__file__))
 templates_path = os.path.join(root_dir, "templates")
@@ -268,7 +269,7 @@ class Sudoku:
             cor = cv.matchTemplate(verificare, careu, cv.TM_CCOEFF_NORMED)
 
             cor = np.max(cor)
-            print(cor)
+            print("Corelatie: ",cor)
             #self.afiseaza_imagine1(f"{cor}", result)
             #self.afiseaza_imagine(f"{cor}",result)
             #self.afiseaza_imagine("1111",careu)
@@ -280,8 +281,10 @@ class Sudoku:
         if not gasit:
             return None,None,None,None,None
         #print(top_left, top_right, bottom_left, bottom_right)
+        #print(top_left,bottom_right)
+        top_left, top_right, bottom_left, bottom_right=[[round(x*xratio),round(y*yratio)] for x,y in [top_left, top_right, bottom_left, bottom_right]]
         puncte = self.defineste_puncte(top_left, top_right, bottom_left, bottom_right)
-
+        #print(top_left,bottom_right)
         copie1 = result.copy()
         copie1 = cv.cvtColor(copie1, cv.COLOR_BGR2GRAY)
         _, thresh = cv.threshold(copie1, 150, 255, cv.THRESH_BINARY_INV)
@@ -291,43 +294,14 @@ class Sudoku:
         matr_og = matrice.copy()
         print(matrice)
         #print("pana aici")
-        print(f"timp: {time.time() - start_time}")
+
+        print(f"timp detectie: {time.time()-start_time}")
+        start_time = time.time()
         matrice=ss.solve_sudoku(matrice)
 
-        print(f"timp: {time.time() - start_time}")
+        print(f"timp rezolvare: {time.time() - start_time}")
         #print(matrice)
         #print(matr_og.tolist())
         return puncte,matr_og,matrice,top_left,bottom_right
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 

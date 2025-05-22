@@ -12,6 +12,7 @@ from pynput import mouse
 from cursor_helper import RealCursor
 from checkers.checkers_detector import CheckersDetector
 from checkers.checkers_solver import CheckersSolver
+from screen_info import screen_height,screen_width,initial_y,initial_x
 
 class CheckersCursor:
     def __init__(self,root):
@@ -36,10 +37,12 @@ class CheckersCursor:
         self.cs=CheckersSolver()
 
 
+
+
     def go_to_destination(self,dest_x,dest_y):
 
         if self.stop:
-            self.root.geometry(f"+{1850}+{940}")
+            self.root.geometry(f"+{initial_x}+{initial_y}")
             self.oprite+=1
             return
         cx = self.root.winfo_x()
@@ -65,7 +68,12 @@ class CheckersCursor:
         screenshot = ImageGrab.grab()
         imagine = np.array(screenshot)
         imagine= cv.cvtColor(imagine, cv.COLOR_RGB2BGR)
-        self.top_left, self.bottom_right, self.segmente, self.puncte, self.medii = self.detector.extrage_careu(imagine)
+        imagine_resized= cv.resize(imagine,(1920, 1080))
+        self.top_left, self.bottom_right, self.segmente, self.puncte, self.medii = self.detector.extrage_careu(imagine_resized,imagine)
+
+        """cv.circle(imagine, tuple(self.bottom_right), 5, (0, 0, 255), -1)
+        cv.circle(imagine, tuple(self.top_left), 5, (0, 0, 255), -1)
+        self.detector.afiseaza_imagine1("bun", imagine)"""
 
         if self.top_left is None:
             self.root.event_generate("<<Rebind>>")
@@ -144,7 +152,7 @@ class CheckersCursor:
     def go_click(self, dest_x, dest_y,hold=False):
 
         if self.stop:
-            self.root.geometry(f"+{1850}+{940}")
+            self.root.geometry(f"+{initial_x}+{initial_y}")
             self.done.set()
             return
         cx = self.root.winfo_x()
@@ -182,7 +190,7 @@ class CheckersCursor:
     def go_drag_drop(self, dest_x, dest_y,ogPos):
 
         if self.stop:
-            self.root.geometry(f"+{1850}+{940}")
+            self.root.geometry(f"+{initial_x}+{initial_y}")
             self.done.set()
             return
         cx = self.root.winfo_x()
@@ -414,7 +422,7 @@ class CheckersCursor:
                 break
             time.sleep(0.5)
         print("totul oprit")
-        self.root.geometry(f"+{1850}+{940}")
+        self.root.geometry(f"+{initial_x}+{initial_y}")
         self.root.event_generate("<<Rebind>>")
         self.stop=False
 

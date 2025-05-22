@@ -12,6 +12,8 @@ from cursor_helper import RealCursor
 
 from sudoku.sudoku_detector import Sudoku
 from sudoku.sudoku_mask import SudokuMask
+from screen_info import screen_height,screen_width,initial_y,initial_x
+
 
 class SudokuCursor:
 
@@ -28,9 +30,11 @@ class SudokuCursor:
         self.nr_incomplet=0
         self.oprite=4
 
+
+
     def go_to_destination(self,dest_x,dest_y):
         if self.stop:
-            self.root.geometry(f"+{1850}+{940}")
+            self.root.geometry(f"+{initial_x}+{initial_y}")
             self.oprite+=1
             return
         cx = self.root.winfo_x()
@@ -54,13 +58,19 @@ class SudokuCursor:
 
 
     def move_to_square(self):
-
         screenshot = ImageGrab.grab()
-        screenshot.save("C:/Users/mihae/OneDrive/Desktop/temp/ss.jpg")
-        screenshot.close()
-        imagine = cv.imread("C:/Users/mihae/OneDrive/Desktop/temp/ss.jpg")
+        imagine = np.array(screenshot)
+        imagine = cv.cvtColor(imagine, cv.COLOR_RGB2BGR)
+        imagine_resized = cv.resize(imagine, (1920, 1080))
+
         sdk=Sudoku()
-        self.puncte,self.incomplet,self.complet,self.top_left,self.bottom_right=sdk.rezolva(imagine)
+
+        self.puncte,self.incomplet,self.complet,self.top_left,self.bottom_right=sdk.rezolva(imagine_resized)
+
+        """cv.circle(imagine, tuple(self.bottom_right), 5, (0, 0, 255), -1)
+        cv.circle(imagine, tuple(self.top_left), 5, (0, 0, 255), -1)
+        sdk.afiseaza_imagine1("bun", imagine)"""
+
         if(self.puncte is None or self.complet is None):
             self.root.event_generate("<<Rebind>>")
             return
@@ -89,16 +99,16 @@ class SudokuCursor:
         l=len(moves)
         if l==0:
             self.oprite += 1
-            self.root.geometry(f"+{1850}+{940}")
+            self.root.geometry(f"+{initial_x}+{initial_y}")
             self.root.event_generate("<<Rebind>>")
             return
 
 
         if self.stop:
-            print("bine bine")
+
 
             self.oprite += 1
-            self.root.geometry(f"+{1850}+{940}")
+            self.root.geometry(f"+{initial_x}+{initial_y}")
             return
         cx = self.root.winfo_x()
         cy = self.root.winfo_y()
@@ -138,7 +148,7 @@ class SudokuCursor:
 
     def go_set_digit(self,dest_x,dest_y,key):
         if self.stop:
-            self.root.geometry(f"+{1850}+{940}")
+            self.root.geometry(f"+{initial_x}+{initial_y}")
             self.oprite+=1
             return
         cx = self.root.winfo_x()
@@ -151,7 +161,7 @@ class SudokuCursor:
             self.oprite+=1
             if self.nr_incomplet == 0:
 
-                self.root.geometry(f"+{1850}+{940}")
+                self.root.geometry(f"+{initial_x}+{initial_y}")
                 self.root.event_generate("<<Rebind>>")
                 return
             self.oprite -= 1
@@ -193,7 +203,7 @@ class SudokuCursor:
                 break
             time.sleep(0.1)
         print("Toate oprite")
-        self.root.geometry(f"+{1850}+{940}")
+        self.root.geometry(f"+{initial_x}+{initial_y}")
         self.root.event_generate("<<Rebind>>")
         self.stop=False
 

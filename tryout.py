@@ -1,14 +1,11 @@
-import cv2
 
-# Încarcă imaginea originală (de exemplu 1920x1080)
-image = cv2.imread('C:/Users/mihae/OneDrive/Desktop/temp/ss.png')
+xr=2
+yr=3
 
-# Dimensiunea dorită (de exemplu 800x600)
-new_width = 1920
-new_height = 1080
+v1=[1,2]
+v2=[3,4]
+v3=[4,5]
+v4=[6,7]
 
-# Redimensionează imaginea
-resized_image = cv2.resize(image, (new_width, new_height))
-
-# Salvează imaginea rezultată
-cv2.imwrite('C:/Users/mihae/OneDrive/Desktop/temp/ss_schimbat.png', resized_image)
+v1,v2,v3,v4=[[x*xr,y*yr] for x,y in [v1,v2,v3,v4]]
+print(v1,v2,v3,v4,sep='\n')
