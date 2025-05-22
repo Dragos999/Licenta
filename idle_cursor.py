@@ -5,7 +5,7 @@ import time
 from sudoku.sudoku_cursor import SudokuCursor
 from xo.xo_cursor import XoCursor
 from checkers.checkers_cursor import CheckersCursor
-from screen_info import screen_height, screen_width, initial_y, initial_x
+from screen_info import screen_height, screen_width, initial_y, initial_x, cale_catre_resurse
 import os
 import sys
 import keyboard
@@ -19,7 +19,8 @@ class Cursor:
         self.xc, self.sdc, self.cc = None, None, None
         self.root = None
 
-        image = Image.open("C:/Users/mihae/OneDrive/Desktop/cursor1.png")
+        cursor_path = os.path.join(cale_catre_resurse, "cursor1.png")
+        image = Image.open(cursor_path)
         image = image.resize((60, 73), Image.NEAREST)
         self.tk_image = ImageTk.PhotoImage(image)
 

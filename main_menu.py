@@ -3,25 +3,30 @@ import tkinter as tk
 from PIL import Image, ImageTk
 import numpy as np
 from idle_cursor import Cursor
-from screen_info import initial_y, initial_x
-
+from screen_info import initial_y, initial_x,cale_catre_resurse
+import os
 
 class Menu(tk.Tk):
     def __init__(self):
         super().__init__()
         self.protocol("WM_DELETE_WINDOW", self.inchide_tot)
         self.title("SecondCursorMainMenu")
+
+        logo_path = os.path.join(cale_catre_resurse, "logo_cursor.ico")
+        self.iconbitmap(logo_path)
         self.geometry(f"800x600")
         self.resizable(False, False)
 
-        self.imagine_background = Image.open("C:/Users/mihae/OneDrive/Desktop/background.png")
+        background_path = os.path.join(cale_catre_resurse, "background.png")
+        self.imagine_background = Image.open(background_path)
         self.imagine_background = self.imagine_background.resize((800, 600))
         self.imagine_background = ImageTk.PhotoImage(self.imagine_background)
 
         background_label = tk.Label(self, image=self.imagine_background)
         background_label.place(x=0, y=0, relwidth=1, relheight=1)
 
-        image = Image.open("C:/Users/mihae/OneDrive/Desktop/cursor1.png").convert("RGBA")
+        cursor_path = os.path.join(cale_catre_resurse, "cursor1.png")
+        image = Image.open(cursor_path).convert("RGBA")
         image = image.resize((50, 61), Image.NEAREST)
         data = np.array(image)
         verde = np.array([0, 255, 0, 255])

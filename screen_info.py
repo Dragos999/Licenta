@@ -1,4 +1,6 @@
 import ctypes
+import os
+import sys
 
 ctypes.windll.user32.SetProcessDPIAware(1)
 
@@ -10,3 +12,8 @@ initial_y = screen_height - 140
 
 xratio = screen_width / 1920
 yratio = screen_height / 1080
+
+if getattr(sys, 'frozen', False):
+    cale_catre_resurse = os.path.join(sys._MEIPASS, "resources")
+else:
+    cale_catre_resurse = os.path.join(os.path.dirname(os.path.abspath(__file__)), "resources")
