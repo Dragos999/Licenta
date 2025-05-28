@@ -170,7 +170,7 @@ class CheckersDetector:
         image_g_blur = cv.GaussianBlur(image_m_blur, (3, 3), 4)
         image_sharpened = cv.addWeighted(image_m_blur, 1.4, image_g_blur, -0.6, 0)
 
-        self.afiseaza_imagine1("image_sharpened",image_sharpened)
+        #self.afiseaza_imagine1("image_sharpened",image_sharpened)
 
         normalized = cv.normalize(image_sharpened, None, 0, 255, cv.NORM_MINMAX)
         #self.afiseaza_imagine1("normalized",normalized)
@@ -331,6 +331,7 @@ class CheckersDetector:
                     else:
                         linie.append(1)
                 else:
+
                     if self.comp_histograme(hist,self.gol) >=0.25 or (i+j+self.adaos)%2==0 or (self.comp_histograme(hist,self.inamic)<0 and self.comp_histograme(hist,self.player)<0):
                         linie.append(0)
                     else:

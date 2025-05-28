@@ -116,7 +116,7 @@ class CheckersSolver:
                 elif cell == -2:
                     score -= 5 + 0.5 * (x in [2,3,4,5])
         if counter_inamic==0:
-            print("victorieeeee")
+
             score += 1000
         return score
 

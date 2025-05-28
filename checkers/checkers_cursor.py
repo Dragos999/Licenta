@@ -278,8 +278,8 @@ class CheckersCursor:
                     self.done.clear()
 
 
-
-                    time.sleep(0.5)
+                    if(k<len(mutari)-1):
+                        time.sleep(0.5)
                 self.root.geometry(f"+{self.bottom_right[0]}+{self.bottom_right[1]}")
 
 
@@ -299,8 +299,8 @@ class CheckersCursor:
                     self.done.wait()
                     self.done.clear()
 
-
-                    time.sleep(0.5)
+                    if (k < len(mutari) - 1):
+                        time.sleep(0.5)
                 self.root.geometry(f"+{self.bottom_right[0]}+{self.bottom_right[1]}")
 
             else:
