@@ -47,6 +47,7 @@ class SudokuMask:
         self.root.wm_attributes("-alpha", 0.0)
 
     def stop(self):
+
         self.root.quit()
 
 

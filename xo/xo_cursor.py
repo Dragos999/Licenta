@@ -311,11 +311,15 @@ class XoCursor:
                 self.bot_turn.clear()
                 self.player_turn.set()
             while True:
+
                 if (self.stop == True):
+
                     break
                 screenshot = ImageGrab.grab()
                 imagine = np.array(screenshot)
                 imagine = cv.cvtColor(imagine, cv.COLOR_RGB2GRAY)
+
+
                 gata=self.detector.verifica_joc_nou(imagine, self.segmente, self.medii)
 
                 if gata:

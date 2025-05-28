@@ -169,7 +169,7 @@ class CheckersCursor:
 
                 self.rc.hold_click()
             else:
-                time.sleep(0.01)
+
                 self.rc.click()
                 self.rc.set_cursor_position(ogPos)
 
@@ -286,11 +286,12 @@ class CheckersCursor:
 
             elif type=="click":
                 for k in range(1,len(mutari)):
-                    i, j = mutari[k-1][0], mutari[k-1][1]
 
-                    self.root.after(0, lambda: self.go_click(self.puncte[i][j][0], self.puncte[i][j][1]))
-                    self.done.wait()
-                    self.done.clear()
+                    if k==1:
+                        i, j = mutari[k - 1][0], mutari[k - 1][1]
+                        self.root.after(0, lambda: self.go_click(self.puncte[i][j][0], self.puncte[i][j][1]))
+                        self.done.wait()
+                        self.done.clear()
 
                     i, j = mutari[k][0], mutari[k][1]
 

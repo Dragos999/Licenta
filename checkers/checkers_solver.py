@@ -58,8 +58,10 @@ class CheckersSolver:
                     temp_board[mid_x][mid_y] = 0
                     if temp_board[end_x][end_y] == 1 and end_x == 0:
                         temp_board[end_x][end_y] = 2
+                        piece=2
                     elif temp_board[end_x][end_y] == -1 and end_x == 7:
                         temp_board[end_x][end_y] = -2
+                        piece=-2
                     self.find_captures(temp_board, end_x, end_y, path, results, piece)
                     found = True
         if not found and len(path) > 1:
@@ -182,19 +184,23 @@ class CheckersSolver:
 """
 # Inițializare tablou simplu
 initial_board = [
-    [0, -1, 0, -1, 0, -1, 0, -1],
-    [-1, 0, -1, 0, -1, 0, -1, 0],
-    [0, -1, 0, 0, 0, -1, 0, -1],
     [0, 0, 0, 0, 0, 0, 0, 0],
-    [0, 1, 0, 0, 0, 0, 0, 0],
-    [0, 0, -1, 0, 1, 0, 1, 0],
-    [0, 1, 0, 1, 0, 1, 0, 1],
-    [1, 0, 1, 0, 1, 0, 1, 0]]
+    [0, -1, 0, -1, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, -1, 0, 0],
+    [0, 0, 0, 0, 0, 0, 1, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0],
+    [0, 0, 0, 0, 0, 0, 0, 0]]
 start=time.time()
-score, best_move, board = minimax(initial_board, depth=10, alpha=-math.inf, beta=math.inf, maximizing_player=True,st=time.time())
+ok=CheckersSolver()
+score, best_move, board = ok.minimax(initial_board, depth=10, alpha=-math.inf, beta=math.inf, maximizing_player=True,st=time.time())
 print("Timp: ", time.time()-start)
 print("Scor:", score)
 print("Mutare optimă:", best_move[len(best_move)-1])
-print(board)
+for rand in board:
+    for x in rand:
+        print(x,end=" ")
+    print()
 for i in range(1,len(best_move)):
     print(best_move[i-1],best_move[i])"""

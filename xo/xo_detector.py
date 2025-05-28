@@ -408,6 +408,7 @@ class XoDetector:
             v=[]
             for j in range(3):
                 img_segmentata=gri[segmente[i][j][0]:segmente[i][j][1],segmente[i][j][2]:segmente[i][j][3]]
+
                 v.append(np.mean(img_segmentata))
             medii.append(v)
         return medii

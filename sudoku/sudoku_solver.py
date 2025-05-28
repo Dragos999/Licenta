@@ -216,8 +216,9 @@ def solve_sudoku(grila):
 
 
     dlx = DLX(matrice_exact_cover, valori_reale)
-    dlx.cauta()
-    return dlx.careu
 
+    dlx.cauta()
+
+    return dlx.careu
 
 

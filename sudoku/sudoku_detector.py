@@ -6,10 +6,9 @@ import numpy as np
 import os
 import time
 import sudoku.sudoku_solver as ss
-from screen_info import xratio,yratio
+from screen_info import xratio,yratio,cale_catre_templates
 
-root_dir = os.path.dirname(os.path.abspath(__file__))
-templates_path = os.path.join(root_dir, "templates")
+
 
 
 class Sudoku:
@@ -132,7 +131,7 @@ class Sudoku:
         for i in indici:
             for j in numere:
 
-                img_template = cv.imread(templates_path+'/t' + str(i) + '/' + str(j) + '.png')
+                img_template = cv.imread(cale_catre_templates+'/t' + str(i) + '/' + str(j) + '.png')
                 img_template = cv.resize(img_template, (0, 0), fx=cx, fy=cy)
                 img_template = cv.cvtColor(img_template, cv.COLOR_BGR2GRAY)
 
@@ -263,7 +262,7 @@ class Sudoku:
             verificare = self.prelucrare(verificare, lines_horizontal, lines_vertical)
             verificare = cv.cvtColor(verificare, cv.COLOR_BGR2GRAY)
 
-            careu = cv.imread(templates_path+"/tabla.jpg")
+            careu = cv.imread(cale_catre_templates+"/tabla.jpg")
             careu = cv.resize(careu, (900, 900))
             careu = cv.cvtColor(careu, cv.COLOR_BGR2GRAY)
             cor = cv.matchTemplate(verificare, careu, cv.TM_CCOEFF_NORMED)

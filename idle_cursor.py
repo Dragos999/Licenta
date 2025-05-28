@@ -96,7 +96,7 @@ class Cursor:
             self.cc.move_to_square()
 
         def stop_cursor(event=None):
-
+            print("se incearca")
             if self.xc is not None:
                 self.xc.stop_cursor()
             if self.sdc is not None:

@@ -17,3 +17,8 @@ if getattr(sys, 'frozen', False):
     cale_catre_resurse = os.path.join(sys._MEIPASS, "resources")
 else:
     cale_catre_resurse = os.path.join(os.path.dirname(os.path.abspath(__file__)), "resources")
+
+if getattr(sys, 'frozen', False):
+    cale_catre_templates = os.path.join(sys._MEIPASS, "sudoku/templates")
+else:
+    cale_catre_templates = os.path.join(os.path.dirname(os.path.abspath(__file__)), "sudoku/templates")

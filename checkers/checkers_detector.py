@@ -170,7 +170,7 @@ class CheckersDetector:
         image_g_blur = cv.GaussianBlur(image_m_blur, (3, 3), 4)
         image_sharpened = cv.addWeighted(image_m_blur, 1.4, image_g_blur, -0.6, 0)
 
-        #self.afiseaza_imagine1("image_sharpened",image_sharpened)
+        self.afiseaza_imagine1("image_sharpened",image_sharpened)
 
         normalized = cv.normalize(image_sharpened, None, 0, 255, cv.NORM_MINMAX)
         #self.afiseaza_imagine1("normalized",normalized)
@@ -396,7 +396,7 @@ class CheckersDetector:
                 x, y, w, h = cv.boundingRect(approx)
                 aspect_ratio = float(w) / h
                 if 0.8 < aspect_ratio < 1.2 and w > 200:
-                    board = approx
+
                     cont.append(c)
 
 
